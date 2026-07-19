@@ -10,7 +10,7 @@ app = Flask(__name__)
 # AZURE AI FOUNDRY CONFIG
 # ==========================================
 
-#ENDPOINT = os.getenv("FOUNDRY_ENDPOINT")
+# ENDPOINT = os.getenv("FOUNDRY_ENDPOINT")
 ENDPOINT = "https://course-chatbot-demo-01-resource.services.ai.azure.com/api/projects/course-chatbot-demo-01"
 
 MODEL_NAME = "gpt-4.1"
@@ -37,18 +37,28 @@ def home():
 @app.route("/chat", methods=["POST"])
 def chat():
 
-    user_message = request.json.get("message", "")
+    try:
 
-    response = client.responses.create(
-        model=MODEL_NAME,
-        input=user_message
-    )
+        user_message = request.json.get("message", "")
 
-    answer = response.output_text
+        response = client.responses.create(
+            model=MODEL_NAME,
+            input=user_message
+        )
 
-    return jsonify({
-        "answer": answer
-    })
+        answer = response.output_text
+
+        return jsonify({
+            "answer": answer
+        })
+
+    except Exception as e:
+
+        print("ERROR:", str(e))
+
+        return jsonify({
+            "answer": f"ERROR: {str(e)}"
+        })
 
 
 if __name__ == "__main__":
