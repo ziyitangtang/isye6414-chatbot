@@ -1,45 +1,11 @@
+from flask import Flask, render_template, request, jsonify
+from openai import OpenAI
 import os
 
-from flask import Flask, render_template, request, jsonify
-from azure.identity import DefaultAzureCredential
-from azure.ai.projects import AIProjectClient
-
-from azure.identity import DefaultAzureCredential
-
-cred = DefaultAzureCredential()
-
-print("Managed Identity configured")
-
-app = Flask(__name__)
-
-# ==========================================
-# AZURE AI FOUNDRY CONFIG
-# ==========================================
-
-# ENDPOINT = os.getenv("FOUNDRY_ENDPOINT")
-ENDPOINT = "https://course-chatbot-demo-01-resource.services.ai.azure.com/api/projects/course-chatbot-demo-01"
-
-project_client = AIProjectClient(
-    endpoint=ENDPOINT,
-    credential=DefaultAzureCredential(),
+client = OpenAI(
+    api_key=os.getenv("AZURE_OPENAI_API_KEY"),
+    base_url="https://course-chatbot-demo-01-resource.openai.azure.com/openai/v1"
 )
-
-AGENT_NAME = "GT-course-assistant"
-AGENT_VERSION = "22"
-
-openai_client = project_client.get_openai_client()
-
-# MODEL_NAME = "gpt-4.1"
-
-# token_provider = get_bearer_token_provider(
-#     DefaultAzureCredential(),
-#     "https://ai.azure.com/.default"
-# )
-
-# client = OpenAI(
-#     base_url=ENDPOINT,
-#     api_key=token_provider
-# )
 
 # ==========================================
 # ROUTES
@@ -56,25 +22,14 @@ def chat():
     try:
 
         user_message = request.json.get("message", "")
+
         print("STEP 1: got message")
 
-        try:
-            response = openai_client.responses.create(
-                model="gpt-4.1",
-                input="Hello"
-            )
-        except Exception as e:
-            print("DIR:", dir(e))
-            
-            for attr in ["body", "response", "status_code", "message"]:
-                try:
-                    print(attr, "=", getattr(e, attr))
-                except Exception:
-                    pass
-            
-            raise
-        
-        
+        response = client.responses.create(
+            model="gpt-4.1",
+            input=user_message
+        )
+
         print("STEP 2: got response")
 
         answer = response.output_text
@@ -86,20 +41,10 @@ def chat():
         })
 
     except Exception as e:
-    
+
         print("ERROR TYPE:", type(e))
         print("ERROR REPR:", repr(e))
-    
-        try:
-            print("ERROR BODY:", e.body)
-        except Exception:
-            pass
-    
-        try:
-            print("ERROR RESPONSE:", e.response)
-        except Exception:
-            pass
-    
+
         return jsonify({
             "answer": f"ERROR: {repr(e)}"
         })
