@@ -80,11 +80,11 @@ def chat():
 
     except Exception as e:
 
-    print("ERROR TYPE:", type(e))
-    print("ERROR REPR:", repr(e))
-
-    return jsonify({
-        "answer": f"ERROR: {repr(e)}"
+        print("ERROR TYPE:", type(e))
+        print("ERROR REPR:", repr(e))
+    
+        return jsonify({
+            "answer": f"ERROR: {repr(e)}"
     })
 
 
