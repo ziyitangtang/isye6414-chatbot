@@ -4,6 +4,12 @@ from flask import Flask, render_template, request, jsonify
 from azure.identity import DefaultAzureCredential
 from azure.ai.projects import AIProjectClient
 
+from azure.identity import DefaultAzureCredential
+
+cred = DefaultAzureCredential()
+
+print("Managed Identity configured")
+
 app = Flask(__name__)
 
 # ==========================================
