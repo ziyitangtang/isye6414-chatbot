@@ -1,8 +1,8 @@
 import os
 
 from flask import Flask, render_template, request, jsonify
-from openai import OpenAI
-from azure.identity import DefaultAzureCredential, get_bearer_token_provider
+from azure.identity import DefaultAzureCredential
+from azure.ai.projects import AIProjectClient
 
 app = Flask(__name__)
 
@@ -11,19 +11,29 @@ app = Flask(__name__)
 # ==========================================
 
 # ENDPOINT = os.getenv("FOUNDRY_ENDPOINT")
-ENDPOINT = "https://course-chatbot-demo-01-resource.services.ai.azure.com/openai/v1/"
+ENDPOINT = "https://course-chatbot-demo-01-resource.services.ai.azure.com/api/projects/course-chatbot-demo-01"
 
-MODEL_NAME = "gpt-4.1"
-
-token_provider = get_bearer_token_provider(
-    DefaultAzureCredential(),
-    "https://ai.azure.com/.default"
+project_client = AIProjectClient(
+    endpoint=ENDPOINT,
+    credential=DefaultAzureCredential(),
 )
 
-client = OpenAI(
-    base_url=ENDPOINT,
-    api_key=token_provider
-)
+AGENT_NAME = "GT-course-assistant"
+AGENT_VERSION = "22"
+
+openai_client = project_client.get_openai_client()
+
+# MODEL_NAME = "gpt-4.1"
+
+# token_provider = get_bearer_token_provider(
+#     DefaultAzureCredential(),
+#     "https://ai.azure.com/.default"
+# )
+
+# client = OpenAI(
+#     base_url=ENDPOINT,
+#     api_key=token_provider
+# )
 
 # ==========================================
 # ROUTES
@@ -41,9 +51,25 @@ def chat():
 
         user_message = request.json.get("message", "")
 
-        response = client.responses.create(
-            model=MODEL_NAME,
-            input=user_message
+        # response = client.responses.create(
+        #     model=MODEL_NAME,
+        #     input=user_message
+        # )
+
+        response = openai_client.responses.create(
+            input=[
+                {
+                    "role": "user",
+                    "content": user_message
+                }
+            ],
+            extra_body={
+                "agent_reference": {
+                    "name": AGENT_NAME,
+                    "version": AGENT_VERSION,
+                    "type": "agent_reference"
+                }
+            }
         )
 
         answer = response.output_text
