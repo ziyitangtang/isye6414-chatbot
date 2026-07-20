@@ -11,7 +11,7 @@ app = Flask(__name__)
 # ==========================================
 
 # ENDPOINT = os.getenv("FOUNDRY_ENDPOINT")
-ENDPOINT = "https://course-chatbot-demo-01-resource.services.ai.azure.com/api/projects/course-chatbot-demo-01"
+ENDPOINT = "https://course-chatbot-demo-01-resource.services.ai.azure.com/openai/v1/"
 
 MODEL_NAME = "gpt-4.1"
 
