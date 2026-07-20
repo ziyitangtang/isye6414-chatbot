@@ -50,11 +50,7 @@ def chat():
     try:
 
         user_message = request.json.get("message", "")
-
-        # response = client.responses.create(
-        #     model=MODEL_NAME,
-        #     input=user_message
-        # )
+        print("STEP 1: got message")
 
         response = openai_client.responses.create(
             input=[
@@ -72,7 +68,11 @@ def chat():
             }
         )
 
+        print("STEP 2: got response")
+
         answer = response.output_text
+
+        print("STEP 3: extracted text")
 
         return jsonify({
             "answer": answer
