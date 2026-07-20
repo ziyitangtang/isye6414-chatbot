@@ -58,25 +58,22 @@ def chat():
         user_message = request.json.get("message", "")
         print("STEP 1: got message")
 
-        # response = openai_client.responses.create(
-        #     input=[
-        #         {
-        #             "role": "user",
-        #             "content": user_message
-        #         }
-        #     ],
-        #     extra_body={
-        #         "agent_reference": {
-        #             "name": AGENT_NAME,
-        #             "version": AGENT_VERSION,
-        #             "type": "agent_reference"
-        #         }
-        #     }
-        # )
-        response = openai_client.responses.create(
-            model="gpt-4.1",
-            input="Hello"
-        )
+        try:
+            response = openai_client.responses.create(
+                model="gpt-4.1",
+                input="Hello"
+            )
+        except Exception as e:
+            print("DIR:", dir(e))
+            
+            for attr in ["body", "response", "status_code", "message"]:
+                try:
+                    print(attr, "=", getattr(e, attr))
+                except Exception:
+                    pass
+            
+            raise
+        
         
         print("STEP 2: got response")
 
